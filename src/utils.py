@@ -34,6 +34,16 @@ class Utils:
 
     @staticmethod
     def load_image_with_scale(path: str, size: tuple[int, int], cache={}) -> pygame.Surface:
+        """Загрузка одного изображения нужного размера
+
+        Args:
+            path (str): Путь к изображению
+            size (tuple[int, int]): Размер итогового изображения ширина/высота
+            cache (dict, optional): кэш. Defaults to {}.
+
+        Returns:
+            pygame.Surface: Итоговое изображение
+        """
         if path in cache:
             if size not in cache[path]:
                 cache[path][size] = pygame.transform.scale(pygame.image.load(path), size)
@@ -83,3 +93,18 @@ class Utils:
             cache[path][image_scaled_size] = tuple(images)
 
         return cache[path][image_scaled_size]
+    
+    @staticmethod
+    def mirror_image(path: str, image: pygame.Surface, cache={}) -> pygame.Surface:
+        if path not in cache:
+            cache[path] = pygame.transform.flip(image)
+        return cache[path]
+    
+    @staticmethod
+    def mirror_images(path: str, images: tuple[pygame.Surface], cache={}) -> tuple[pygame.Surface]:
+        if path not in cache:
+            result = []
+            for image in images:
+                result.append(pygame.transform.flip(image))
+            cache[path] = tuple(result)
+        return cache[path]

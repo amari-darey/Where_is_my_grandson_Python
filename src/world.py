@@ -56,3 +56,17 @@ class World:
                 entities.add(entity)
         
         return tuple(entities)
+    
+    def get_single_entity_with_all(self, *components: Component) -> UUID|None:
+        """Получить первую подходящуб сущность
+
+        Args:
+            components (Component): классы компонентов
+
+        Returns:
+            UUID: id сущности
+        """
+        components = set(components)
+        for entity, entity_components in self.__entities.items():
+            if components.issubset(set(entity_components.keys())):
+                return entity

@@ -24,6 +24,15 @@ class ComponentTransform(Component):
     
 
 @dataclass
+class ComponentControl(Component):
+    up: int
+    left: int
+    down: int
+    right: int
+    attack: int
+
+
+@dataclass
 class ComponentImage(Component):
     image: pygame.Surface
 

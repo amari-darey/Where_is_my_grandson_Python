@@ -34,6 +34,8 @@ class Game:
             if not self.pause:
                 keys = pygame.key.get_pressed()
                 self.window.blit(self.map, (0, 0))
-                Systems.draw_entities(self.world, self.window)
+                Systems.system_draw_entities(self.world, self.window)
+                Systems.system_animation_update(self.world, self.dt)
+                Systems.system_player_movement(self.world, keys, self.dt)
             pygame.display.update()
             self.dt = self.timer.tick(self.__tick_rate)
