@@ -3,6 +3,7 @@ from collections import deque
 
 from src.world import World
 from src.utils import Utils
+from src.assests_manager import AnimationAssets
 from src.components import *
 from src.constants import *
 
@@ -35,5 +36,13 @@ class EntityFabric:
             ComponentControl(pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d, pygame.K_SPACE),
             ComponentSpeed(PLAYER_SPEED),
             ComponentImage(entity_animation[0]),
-            ComponentAnimation(deque(entity_animation), PLAYER_ANIMATION_FRAME_RATE, 0)
+            ComponentAnimation(PLAYER_ANIMATION_FRAME_RATE, 0),
+            ComponentState(PLAYER_START_STATE, None, type(PLAYER_START_STATE))
         )
+
+        for state in PLAYER_STATES:
+            Utils.load_animations(entity, state)
+
+        return entity
+
+    

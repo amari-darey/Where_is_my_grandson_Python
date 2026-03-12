@@ -2,6 +2,7 @@ import pygame
 from abc import ABC
 from dataclasses import dataclass
 from collections import deque
+from enum import Enum
 
 
 class Component(ABC): pass
@@ -39,7 +40,6 @@ class ComponentImage(Component):
 
 @dataclass
 class ComponentAnimation(Component):
-    image: deque[pygame.Surface]
     frame_rate: int
     time_from_last_frame: int
 
@@ -47,3 +47,9 @@ class ComponentAnimation(Component):
 @dataclass
 class ComponentSpeed(Component):
     speed: int
+
+@dataclass
+class ComponentState(Component):
+    current_state: Enum
+    previous_state: Enum
+    all_states: Enum

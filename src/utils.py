@@ -1,5 +1,9 @@
 import pygame
 import os
+from enum import Enum
+from uuid import UUID
+
+from src.assests_manager import AnimationAssets
 
 
 class Utils:
@@ -97,7 +101,7 @@ class Utils:
     @staticmethod
     def mirror_image(path: str, image: pygame.Surface, cache={}) -> pygame.Surface:
         if path not in cache:
-            cache[path] = pygame.transform.flip(image)
+            cache[path] = pygame.transform.flip(image, True, False)
         return cache[path]
     
     @staticmethod
@@ -105,6 +109,19 @@ class Utils:
         if path not in cache:
             result = []
             for image in images:
-                result.append(pygame.transform.flip(image))
+                result.append(pygame.transform.flip(image, True, False))
             cache[path] = tuple(result)
         return cache[path]
+    
+    @staticmethod
+    def load_animations(entity_id: UUID, states: tuple[tuple[Enum, str, tuple[int, int], tuple[int, int], bool]]) -> None:
+        assets = AnimationAssets()
+        state, path, tile_size, size, mirror = states
+        if not mirror:
+            images = Utils.load_tile_set_with_scale(path, tile_size, size)
+            assets.add_asset(entity_id, state, images)
+        else:
+            images = Utils.load_tile_set_with_scale(path, tile_size, size)
+            images = Utils.mirror_images(path, images)
+            assets.add_asset(entity_id, state, images)
+        
