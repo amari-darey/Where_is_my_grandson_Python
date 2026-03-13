@@ -10,7 +10,7 @@ from src.constants import *
 
 class EntityFabric:
     @staticmethod
-    def get_player(world: World) -> UUID:
+    def get_player(world: World, player_pos: tuple[int, int]) -> UUID:
         """Создание игрока
 
         Components entered:
@@ -22,7 +22,8 @@ class EntityFabric:
             ComponentAnimation
 
         Args:
-            world (World): экземпляр класса World
+            world (World): Экземпляр класса World
+            player_pos (tuple[int, int]): Позиция игрока в тайлах
 
         Returns:
             UUID: id игрока

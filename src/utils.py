@@ -4,7 +4,7 @@ from enum import Enum
 from uuid import UUID
 
 from src.assests_manager import AnimationAssets
-
+from src.constants import *
 
 class Utils:
     @staticmethod
@@ -14,25 +14,33 @@ class Utils:
         game_map = []
         with open(path, "r", encoding="utf-8") as file:
             for line in file:
-                game_map.append(list(map(int, line.split())))
+                game_map.append(line.split())
         
         return game_map
 
     @staticmethod
-    def create_map(game_map: list[list]):
-        size = 128
-        surface = pygame.Surface((len(game_map[0]) * size, len(game_map)* size))
-        tile_1 = Utils.load_image_with_scale("tests/test_tile_4.png", (128, 128))
-        tile_2 = Utils.load_image_with_scale("tests/test_tile_3.png", (128, 128))
-        x = 0
-        y = 0
-        for row in game_map:
-            for col in row:
-                tile = tile_1 if col == 0 else tile_2
-                surface.blit(tile, (x, y))
-                x += size
+    def create_map(game_map: dict[str, tuple[tuple[str]]]) -> pygame.Surface:
+        """Создание карты
+
+        Args:
+            game_map (dict[str, tuple[tuple[str]]]): Словарь где ключами выступают названия слоёв 
+            а значениями кортеж с кортежами с номерами тайлов
+
+        Returns:
+            pygame.Surface: Картинка карты
+        """
+        map_width = len(game_map["base"][0])
+        map_height = len(game_map["base"])
+        surface = pygame.Surface((map_width * TILE_SIZE, map_height* TILE_SIZE))
+        for name, layer in game_map.items():
             x = 0
-            y += size
+            y = 0
+            for row in layer:
+                for col in row:
+                    surface.blit(Utils.load_image_with_scale(TILES[col], (TILE_SIZE, TILE_SIZE)), (x, y))
+                    x += TILE_SIZE
+                x = 0
+                y += TILE_SIZE
         return surface
 
 

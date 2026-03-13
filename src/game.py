@@ -6,7 +6,11 @@ from src.assests_manager import AnimationAssets
 
 
 class Game:
-    def __init__(self, world: World, assets: AnimationAssets, screen_size: tuple[int, int], tick_rate: int, game_map: tuple[tuple]):
+    def __init__(
+            self, world: World, assets: AnimationAssets, 
+            screen_size: tuple[int, int], tick_rate: int, 
+            game_map: tuple[tuple]
+            ):
         self.world = world
         self.assets = assets
         self.__screen_size = screen_size
@@ -15,7 +19,7 @@ class Game:
         self.window = None
         self.timer = None
 
-        self.map = Utils.create_map(game_map)
+        self.map = game_map
         self.dt = 0
 
         self.game = True
