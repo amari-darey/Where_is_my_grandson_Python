@@ -1,6 +1,11 @@
 import pygame
+
+from uuid import UUID
+
+
 from src.utils import Utils
 from src.world import World
+from src.camera import Camera
 from src.systems import Systems
 from src.assests_manager import AnimationAssets
 
@@ -9,7 +14,7 @@ class Game:
     def __init__(
             self, world: World, assets: AnimationAssets, 
             screen_size: tuple[int, int], tick_rate: int, 
-            game_map: tuple[tuple]
+            game_map: tuple[tuple], player_id: UUID
             ):
         self.world = world
         self.assets = assets
@@ -20,7 +25,10 @@ class Game:
         self.timer = None
 
         self.map = game_map
+        self.camera = Camera(0, 0, *self.__screen_size)
         self.dt = 0
+
+        self.player_id = player_id
 
         self.game = True
         self.pause = False
@@ -39,8 +47,9 @@ class Game:
                     self.game = False
             if not self.pause:
                 keys = pygame.key.get_pressed()
-                self.window.blit(self.map, (0, 0))
-                Systems.system_draw_entities(self.world, self.window)
+                self.camera.update(self.world, self.player_id, self.map)
+                Systems.system_map_draw(self.map, self.window, self.camera)
+                Systems.system_draw_entities(self.world, self.window, self.camera)
                 Systems.system_animation_update(self.world, self.assets, self.dt)
                 Systems.system_player_movement(self.world, keys, self.dt)
             pygame.display.update()

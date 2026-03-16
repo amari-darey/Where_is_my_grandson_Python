@@ -132,4 +132,16 @@ class Utils:
             images = Utils.load_tile_set_with_scale(path, tile_size, size)
             images = Utils.mirror_images(path, images)
             assets.add_asset(entity_id, state, images)
+
+    @staticmethod
+    def tiles_pos_to_world(tile_pos: tuple[int, int]) -> tuple[int, int]:
+        """Переводит позицию в тайлах в глобальную позицию
+
+        Args:
+            tile_pos (tuple[int, int]): Позиция тайла в формета (ряд, колонка)
+
+        Returns:
+            tuple[int, int]: Позиция в глобальных кординатах
+        """
+        return tile_pos[0] * TILE_SIZE, tile_pos[1] * TILE_SIZE
         

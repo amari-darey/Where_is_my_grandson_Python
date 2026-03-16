@@ -1,13 +1,15 @@
 import pygame
+from uuid import UUID
 
 from src.world import World
+from src.camera import Camera
 from src.assests_manager import AnimationAssets
 from src.components import *
 
 
 class Systems:
     @staticmethod
-    def system_draw_entities(world: World, window: pygame.Surface) -> None:
+    def system_draw_entities(world: World, window: pygame.Surface, camera: Camera) -> None:
         """Система отрисовки сущностей
         Отрисовывает все сущности содержащие компоненты ComponentImage, ComponentTransform
 
@@ -19,7 +21,8 @@ class Systems:
         for entity in entities:
             transform = world.get_component(entity, ComponentTransform)
             image = world.get_component(entity, ComponentImage)
-            window.blit(image.image, (transform.x, transform.y))
+            pos_x, pos_y = camera.cordinate_world_to_screen((transform.x, transform.y))
+            window.blit(image.image, (pos_x, pos_y))
 
     @staticmethod
     def system_animation_update(world: World, animation_assets: AnimationAssets, dt: int) -> None:
@@ -41,6 +44,18 @@ class Systems:
                 asset.rotate(1)
                 animation.time_from_last_frame = 0
                 image_component.image = asset[0]
+
+    @staticmethod
+    def system_map_draw(map: pygame.Surface, window: pygame.Surface, camera: Camera) -> None:
+        """Отрисовка карты с учётом офсета камеры
+
+        Args:
+            map (pygame.Surface): Карта
+            window (pygame.Surface): Surface на котором нужно отрисовать карту
+            camera (Camera): экземпляр класса Camera
+        """
+        window.blit(map, (0 - camera.ofset_x, 0 - camera.ofset_y))
+
 
     @staticmethod
     def system_player_movement(world: World, key: dict, dt: int) -> None:

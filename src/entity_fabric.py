@@ -10,7 +10,7 @@ from src.constants import *
 
 class EntityFabric:
     @staticmethod
-    def get_player(world: World, player_pos: tuple[int, int]) -> UUID:
+    def get_player(world: World, pos: tuple[int, int]) -> UUID:
         """Создание игрока
 
         Components entered:
@@ -20,20 +20,24 @@ class EntityFabric:
             ComponentSpeed
             ComponentImage
             ComponentAnimation
+            ComponentState
 
         Args:
             world (World): Экземпляр класса World
-            player_pos (tuple[int, int]): Позиция игрока в тайлах
+            pos (tuple[int, int]): позиция зомби в тайлах
 
         Returns:
             UUID: id игрока
         """
+        if world.get_single_entity_with_all(ComponentPlayer): return
+
         entity = world.create_entity()
+        entyti_pos = Utils.tiles_pos_to_world(pos)
         entity_animation = Utils.load_tile_set_with_scale(PLAYER_IDLE_IMG, PLAYER_IDLE_TILESET_SIZE, PLAYER_SIZE)
         world.add_component(
             entity,
             ComponentPlayer(),
-            ComponentTransform(*PLAYER_POS, *PLAYER_SIZE),
+            ComponentTransform(*entyti_pos, *PLAYER_SIZE),
             ComponentControl(pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d, pygame.K_SPACE),
             ComponentSpeed(PLAYER_SPEED),
             ComponentImage(entity_animation[0]),
@@ -45,5 +49,41 @@ class EntityFabric:
             Utils.load_animations(entity, state)
 
         return entity
+    
+    @staticmethod
+    def get_zombie(world: World, pos: tuple[int, int]) -> UUID:
+        """Создание зомби
+
+        Components entered:
+            ComponentEnemy
+            ComponentTransform
+            ComponentImage
+            ComponentAnimation
+            ComponentState
+
+        Args:
+            world (World): Экземпляр класса World
+            pos (tuple[int, int]): позиция зомби в тайлах
+
+        Returns:
+            UUID: id зомби
+        """
+        entity = world.create_entity()
+        entyti_pos = Utils.tiles_pos_to_world(pos)
+        entity_animation = Utils.load_tile_set_with_scale(ZOMBIE_IDLE_IMG, ZOMBIE_IDLE_TILESET_SIZE, ZOMBIE_SIZE)
+        world.add_component(
+            entity,
+            ComponentEnemy(),
+            ComponentTransform(*entyti_pos, *ZOMBIE_SIZE),
+            ComponentImage(entity_animation[0]),
+            ComponentAnimation(ZOMBIE_ANIMATION_FRAME_RATE, 0),
+            ComponentState(ZOMBIE_START_STATE, None, type(ZOMBIE_START_STATE))
+        )
+
+        for state in ZOMBIE_STATES:
+            Utils.load_animations(entity, state)
+
+        return entity
+
 
     
