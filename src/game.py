@@ -8,6 +8,8 @@ from src.world import World
 from src.camera import Camera
 from src.systems import Systems
 from src.assests_manager import AnimationAssets
+from src.trigger_manager import TriggerManager
+from src.components import *
 
 
 class Game:
@@ -18,6 +20,7 @@ class Game:
             ):
         self.world = world
         self.assets = assets
+        self.trigger = TriggerManager()
         self.__screen_size = screen_size
         self.__tick_rate = tick_rate
 
@@ -37,7 +40,7 @@ class Game:
 
     def pygame_setup(self) -> None:
         pygame.init()
-        self.window = pygame.display.set_mode(self.__screen_size, pygame.RESIZABLE)
+        self.window = pygame.display.set_mode(self.__screen_size)
         self.timer = pygame.time.Clock()
 
     def run(self) -> None:
@@ -52,5 +55,6 @@ class Game:
                 Systems.system_draw_entities(self.world, self.window, self.camera)
                 Systems.system_animation_update(self.world, self.assets, self.dt)
                 Systems.system_player_movement(self.world, keys, self.dt)
+                self.trigger.update(self.world, self.dt)
             pygame.display.update()
             self.dt = self.timer.tick(self.__tick_rate)

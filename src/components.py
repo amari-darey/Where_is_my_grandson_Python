@@ -10,6 +10,7 @@ class Component(ABC): pass
 
 class ComponentPlayer(Component): pass
 class ComponentEnemy(Component): pass
+class ComponentZombie(Component): pass
 
 
 @dataclass

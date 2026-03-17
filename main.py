@@ -9,18 +9,18 @@ from src.constants import *
 
 
 def setup_game(world: World) -> tuple:
-    player_id = EntityFabric.get_player(world, PLAYER_POS)
-    EntityFabric.get_zombie(world, ZOMBIE_POS)
+    player_id = EntityFabric.create_player(world, PLAYER_POS)
+    EntityFabric.create_zombie(world, ZOMBIE_POS)
 
     layers = LevelManager()
-    map = Utils.create_map(layers.get_map())
+    game_map = Utils.create_map(layers.get_map())
 
-    return player_id, map
+    return player_id, game_map
 
 
 if __name__ == "__main__":
     world = World()
     assets = AnimationAssets()
-    player_id, map = setup_game(world)
-    game = Game(world, assets, SCREEN_SIZE, 60, map, player_id)
+    player_id, game_map = setup_game(world)
+    game = Game(world, assets, SCREEN_SIZE, 60, game_map, player_id)
     game.run()

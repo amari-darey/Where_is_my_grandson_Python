@@ -11,6 +11,8 @@ class LevelManager:
         self.__load_local_levels()
 
     def __load_local_levels(self) -> None:
+        """Загрузка уровней из стандартной папки Path_to_game/levels
+        """
         if os.path.exists(LEVELS_PATH):
             for level in os.listdir(LEVELS_PATH):
                 with open(os.path.join(LEVELS_PATH, level)) as level:
@@ -19,19 +21,29 @@ class LevelManager:
                         self.__levels[data["name"]] = data
 
     def __check_level(self, level: dict) -> bool:
+        """Проверка на соответсвие уровню
+        Проверяемые пункты:
+            Уровень имеет ключ name
+            Имя уровня не совпадает с ранее загруженными
+            Уровень имеет ключ layers
+                По ключу layers есть ключ base
+            Уровень имеет ключ player_start_pos
+
+        Args:
+            level (dict): Уровень
+
+        Returns:
+            bool: Проходит ли уровень проверку
+        """
         check_list = []
         check_list.append(level.get("name"))
+        check_list.append(level.get("name") not in self.__levels)
         layers = level.get("layers")
         check_list.append(layers)
         if layers:
             check_list.append(level["layers"].get("base"))
-        check_list.append(level.get("player_stat_pos"))
+        check_list.append(level.get("player_start_pos"))
         return all(check_list)
     
     def get_map(self) -> dict:
         return self.__levels["Test"]["layers"]
-
-    def test_print(self):
-        for k, v in self.__levels.items():
-            print(k)
-            print(v)

@@ -10,7 +10,7 @@ from src.constants import *
 
 class EntityFabric:
     @staticmethod
-    def get_player(world: World, pos: tuple[int, int]) -> UUID:
+    def create_player(world: World, pos: tuple[int, int]) -> UUID:
         """Создание игрока
 
         Components entered:
@@ -51,11 +51,12 @@ class EntityFabric:
         return entity
     
     @staticmethod
-    def get_zombie(world: World, pos: tuple[int, int]) -> UUID:
+    def create_zombie(world: World, pos: tuple[int, int]) -> UUID:
         """Создание зомби
 
         Components entered:
             ComponentEnemy
+            ComponentZombie
             ComponentTransform
             ComponentImage
             ComponentAnimation
@@ -74,6 +75,7 @@ class EntityFabric:
         world.add_component(
             entity,
             ComponentEnemy(),
+            ComponentZombie(),
             ComponentTransform(*entyti_pos, *ZOMBIE_SIZE),
             ComponentImage(entity_animation[0]),
             ComponentAnimation(ZOMBIE_ANIMATION_FRAME_RATE, 0),

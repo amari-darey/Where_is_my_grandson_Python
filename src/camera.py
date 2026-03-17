@@ -5,7 +5,6 @@ from src.world import World
 from src.components import *
 
 
-
 class Camera:
     def __init__(self, x: int, y: int, width: int, height: int):
         self.x = x
@@ -20,7 +19,8 @@ class Camera:
         self.__center_y = height // 2
 
     def update(self, world: World, target: UUID, game_map: pygame. Surface) -> None:
-        """Обновляет офсет камеры, относительно target
+        """Обновляет офсет камеры, относительно target.
+        target остаётся в центре камеры.
 
         Args:
             world (World): экземпляр класса World
