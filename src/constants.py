@@ -28,6 +28,7 @@ TILES = {
 }
 TILE_SIZE = 128
 
+PLAYER_NAME = "Пьяный кузнец"
 PLAYER_POS = (0, 0)
 PLAYER_SIZE = (128, 128)
 PLAYER_IDLE_IMG = r"D:\currentProject\nothingNameGame\tests\player_idle.png"
@@ -53,3 +54,9 @@ ZOMBIE_STATES = (
     (StateZombie.IDLE_LEFT, "tests\zombie_idle.png", ZOMBIE_IDLE_TILESET_SIZE, ZOMBIE_SIZE, False),
     (StateZombie.IDLE_RIGHT, "tests\zombie_idle.png", ZOMBIE_IDLE_TILESET_SIZE, ZOMBIE_SIZE, True),
 )
+
+FONT_PATH = "Arial"
+FONT_TITLE_SIZE = 60
+FONT_CONTEXT_SIZE = 30
+FONT_TITLE_COLOR = (122, 32, 13)
+FONT_CONTEXT_COLOR = (255, 255, 255)

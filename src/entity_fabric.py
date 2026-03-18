@@ -19,6 +19,7 @@ class EntityFabric:
             ComponentControl
             ComponentSpeed
             ComponentImage
+            ComponentDialog
             ComponentAnimation
             ComponentState
 
@@ -34,6 +35,7 @@ class EntityFabric:
         entity = world.create_entity()
         entyti_pos = Utils.tiles_pos_to_world(pos)
         entity_animation = Utils.load_tile_set_with_scale(PLAYER_IDLE_IMG, PLAYER_IDLE_TILESET_SIZE, PLAYER_SIZE)
+        entity_dialog_image = Utils.load_tile_set_with_scale(PLAYER_IDLE_IMG, PLAYER_IDLE_TILESET_SIZE, (800, 800))[0]
         world.add_component(
             entity,
             ComponentPlayer(),
@@ -41,6 +43,7 @@ class EntityFabric:
             ComponentControl(pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d, pygame.K_SPACE),
             ComponentSpeed(PLAYER_SPEED),
             ComponentImage(entity_animation[0]),
+            ComponentDialog(PLAYER_NAME, entity_dialog_image),
             ComponentAnimation(PLAYER_ANIMATION_FRAME_RATE, 0),
             ComponentState(PLAYER_START_STATE, None, type(PLAYER_START_STATE))
         )

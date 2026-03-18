@@ -40,6 +40,12 @@ class ComponentImage(Component):
 
 
 @dataclass
+class ComponentDialog(Component):
+    name: str
+    image: pygame.Surface
+
+
+@dataclass
 class ComponentAnimation(Component):
     frame_rate: int
     time_from_last_frame: int
