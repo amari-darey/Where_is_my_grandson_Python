@@ -10,7 +10,7 @@ from src.components import *
 class Systems:
     @staticmethod
     def system_draw_entities(world: World, window: pygame.Surface, camera: Camera) -> None:
-        """Система отрисовки сущностей
+        """Система отрисовки сущностей  
         Отрисовывает все сущности содержащие компоненты ComponentImage, ComponentTransform
 
         Args:
@@ -26,7 +26,7 @@ class Systems:
 
     @staticmethod
     def system_animation_update(world: World, animation_assets: AnimationAssets, dt: int) -> None:
-        """Обновление анимации
+        """Обновление анимации  
         Если время с последней анимации больше чем frame_rate то в ComponentImage записывается новое изображение
 
         Args:

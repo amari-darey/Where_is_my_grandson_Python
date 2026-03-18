@@ -12,8 +12,9 @@ def setup_game(world: World) -> tuple:
     player_id = EntityFabric.create_player(world, PLAYER_POS)
     EntityFabric.create_zombie(world, ZOMBIE_POS)
 
-    layers = LevelManager()
-    game_map = Utils.create_map(layers.get_map())
+    level_manager = LevelManager()
+    levels = level_manager.get_levels_name()
+    game_map = Utils.create_map(level_manager.get_map(levels[0]))
 
     return player_id, game_map
 

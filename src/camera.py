@@ -19,7 +19,7 @@ class Camera:
         self.__center_y = height // 2
 
     def update(self, world: World, target: UUID, game_map: pygame. Surface) -> None:
-        """Обновляет офсет камеры, относительно target.
+        """Обновляет офсет камеры, относительно target.  
         target остаётся в центре камеры.
 
         Args:

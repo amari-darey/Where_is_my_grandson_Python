@@ -8,8 +8,9 @@ from src.constants import *
 
 
 class TriggerManager:
-    """Менеджер триггеров
-    Структура хранения:
+    """Менеджер триггеров  
+    Структура хранения:  
+    ``` python
     {
         "touch": {
             UUID: {
@@ -29,6 +30,7 @@ class TriggerManager:
             }
         }
     }
+    ```
     """
     def __init__(self):
         self.__triggers = {}
@@ -95,9 +97,9 @@ class TriggerManager:
         return trigger_id
     
     def update(self, world: World, dt: int) -> None:
-        """Обновление системы триггеров
-        дабавляет текущий dt к таймеру, что бы отслеживать time триггеры
-        Проверяет срабатывания time и touch триггеров
+        """Обновление системы триггеров  
+        дабавляет текущий dt к таймеру, что бы отслеживать time триггеры  
+        Проверяет срабатывания time и touch триггеров  
 
         Args:
             world (World): Экземпляр класса World
