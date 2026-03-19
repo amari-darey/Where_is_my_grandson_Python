@@ -23,8 +23,6 @@ class Game:
         self.assets = assets
         self.trigger = TriggerManager()
         self.dialog = DialogManager(None, self.change_game_state)
-        dialog_id = self.dialog.add_dialog(self.world, player_id, ("Упс... В говно наступил...", "Ну что за день такой"))
-        self.trigger.create_touch_trigger((2, 2), (1, 1), lambda: self.dialog.run_dialog(dialog_id), tuple(), (ComponentPlayer, ), False)
         self.__screen_size = screen_size
         self.__tick_rate = tick_rate
 
@@ -71,6 +69,7 @@ class Game:
                 Systems.system_animation_update(self.world, self.assets, self.dt)
                 Systems.system_player_movement(self.world, keys, self.dt)
                 self.trigger.update(self.world, self.dt)
+                Systems.system_draw_circle_around_target(self.world, self.camera, mouse_pos, self.window)
 
             if self.game_state == GameState.DIALOG:
                 self.dialog.update(self.dt, mouse_pos, mouse_relesed)

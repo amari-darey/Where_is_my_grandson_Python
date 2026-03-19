@@ -4,6 +4,9 @@ from enum import Enum
 from uuid import UUID
 
 from src.assests_manager import AnimationAssets
+from src.world import World
+from src.camera import Camera
+from src.components import ComponentEnemy, ComponentTransform
 from config.tiles import *
 
 
@@ -145,4 +148,37 @@ class Utils:
             tuple[int, int]: Позиция в глобальных кординатах
         """
         return tile_pos[0] * TILE_SIZE, tile_pos[1] * TILE_SIZE
+    
+    @staticmethod
+    def get_closest_enemy_to_mouse(
+        world: World, 
+        camera: Camera, 
+        mouse_pos: tuple[int, int]|pygame.Vector2, 
+        max_distanse: int = 150
+        ) -> UUID:
+        """Определяет ближайшего к указателю мыши противника
+
+        Args:
+            world (World): Экземпляр класса World
+            camera (Camera): Экземпляр класса Camera
+            mouse_pos (tuple[int, int] | pygame.Vector2): Позиция мыши
+            max_distanse (int, optional): Максимальная дистанция для обнаружения. Defaults to 150.
+
+        Returns:
+            UUID: id ближайшей сущности
+        """
+        mouse_pos = mouse_pos if isinstance(mouse_pos, pygame.Vector2) else pygame.Vector2(mouse_pos)
+        closest = None
+        min_dist = float("inf")
+        entities = world.get_entities_with_all(ComponentEnemy, ComponentTransform)
+        ofset = pygame.Vector2(camera.ofset_x, camera.ofset_y)
+        for entity in entities:
+            transform = world.get_component(entity, ComponentTransform)
+            entity_pos = pygame.Vector2(transform.rect.center) - ofset
+            dist = mouse_pos.distance_to(entity_pos)
+            if dist < min_dist and dist < max_distanse:
+                min_dist = dist
+                closest = entity
+
+        return closest
         

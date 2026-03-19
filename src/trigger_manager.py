@@ -120,7 +120,6 @@ class TriggerManager:
             self.__call_trigger(*trigger)
 
         self.__get_allow_entities(world, (), {})
-        
 
     def __call_trigger(self, trigger_key: str, id: UUID):
         """Вызов коллбэка триггера
@@ -172,5 +171,3 @@ class TriggerManager:
         if components not in cache:
             cache[components] = world.get_entities_with_all(*components)
         return cache[components]
-        
-

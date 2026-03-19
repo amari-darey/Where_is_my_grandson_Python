@@ -5,6 +5,7 @@ from src.utils import Utils
 from src.entity_fabric import EntityFabric
 from src.assests_manager import AnimationAssets
 from src.level_manager import LevelManager
+from src.components import *
 from config.game import SCREEN_SIZE
 from config.entities.player import *
 from config.entities.zombie import *
@@ -21,9 +22,34 @@ def setup_game(world: World) -> tuple:
     return player_id, game_map
 
 
+def setup_event(world: World, game: Game):
+    dialog_id = game.dialog.add_dialog(
+        world, 
+        player_id, 
+        ("Упс... В говно наступил...", "Ну что за день такой")
+        )
+    game.trigger.create_touch_trigger(
+        (2, 2), 
+        (0.2, 0.2), 
+        lambda: game.dialog.run_dialog(dialog_id), 
+        (), 
+        (ComponentPlayer, ), 
+        False
+        )
+    game.trigger.create_touch_trigger(
+        (3, 3), 
+        (0.5, 0.5), 
+        lambda: [EntityFabric.create_zombie(world, (x, 4)) for x in range(5)], 
+        (), 
+        (ComponentPlayer, ), 
+        False
+        )
+
+
 if __name__ == "__main__":
     world = World()
     assets = AnimationAssets()
     player_id, game_map = setup_game(world)
     game = Game(world, assets, SCREEN_SIZE, 60, game_map, player_id)
+    setup_event(world, game)
     game.run()

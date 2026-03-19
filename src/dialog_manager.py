@@ -35,13 +35,13 @@ class DialogManager:
 
         self.__change_state = change_state_method
 
-        self.active_dialog = None
-        self.text_index = 0
-        self.char_index = 0
-        self.text_finish = False
+        self.__active_dialog = None
+        self.__text_index = 0
+        self.__char_index = 0
+        self.__text_finish = False
 
-        self.time_to_next_char = TIME_TO_NEXT_CHAR
-        self.time_last_char = 0
+        self.__time_to_next_char = TIME_TO_NEXT_CHAR
+        self.__time_last_char = 0
 
     def add_dialog(self, world: World, target: UUID, text: tuple[str]) -> UUID:
         """Добавить диалог
@@ -74,10 +74,10 @@ class DialogManager:
         """
         self.__change_state(GameState.DIALOG)
 
-        self.active_dialog = self.__dialogs[dialog_id]
-        self.text_index = 0
-        self.char_index = 0
-        self.time_last_char = 100
+        self.__active_dialog = self.__dialogs[dialog_id]
+        self.__text_index = 0
+        self.__char_index = 0
+        self.__time_last_char = 100
 
     def finish_dialog(self) -> None:
         """Окончание диалога  
@@ -85,10 +85,10 @@ class DialogManager:
         """
         self.__change_state(GameState.RUN)
 
-        self.active_dialog = None
-        self.text_index = 0
-        self.char_index = 0
-        self.time_last_char = 0
+        self.__active_dialog = None
+        self.__text_index = 0
+        self.__char_index = 0
+        self.__time_last_char = 0
 
     def draw(self, window: pygame.Surface):
         """Отрисовка диалога на экране
@@ -96,9 +96,9 @@ class DialogManager:
         Args:
             window (pygame.Surface): Surface на котором нужно отрисовать диалог
         """
-        if not self.active_dialog: return
+        if not self.__active_dialog: return
         
-        window.blit(self.active_dialog.image, (SCREEN_SIZE[0]-600, SCREEN_SIZE[1]-790))
+        window.blit(self.__active_dialog.image, (SCREEN_SIZE[0]-600, SCREEN_SIZE[1]-790))
         window.blit(self.__dialog_image, self.__fon_pos)
 
     def __draw_dialog_surface(self):
@@ -106,31 +106,31 @@ class DialogManager:
         """
         self.__dialog_image = pygame.Surface((SCREEN_SIZE[0], SCREEN_SIZE[1]//2), pygame.SRCALPHA)
         self.__dialog_image.blit(self.__fon, (0, 0))
-        self.__dialog_image.blit(self.__title_font.render(self.active_dialog.title, True, FONT_TITLE_COLOR), (110, 40))
-        self.__dialog_image.blit(self.__context_font.render(self.active_dialog.text[self.text_index][0:self.char_index], True, FONT_CONTEXT_COLOR), (140, 90))
+        self.__dialog_image.blit(self.__title_font.render(self.__active_dialog.title, True, FONT_TITLE_COLOR), (110, 40))
+        self.__dialog_image.blit(self.__context_font.render(self.__active_dialog.text[self.__text_index][0:self.__char_index], True, FONT_CONTEXT_COLOR), (140, 90))
 
     def __update_current_text(self):
         """Обновление текущего отображаемого текста  
         Смена строк
         """
-        text = self.active_dialog.text[self.text_index]
+        text = self.__active_dialog.text[self.__text_index]
         click_in_dialog = self.__mouse_rect.colliderect(self.__dialog_rect)
 
-        if self.char_index < len(text):
+        if self.__char_index < len(text):
             if self.__mouse_released and click_in_dialog:
-                self.char_index = len(text) - 1
+                self.__char_index = len(text) - 1
                 self.__mouse_released = False
             else:
-                self.char_index += 1
+                self.__char_index += 1
 
         else:
-            if self.text_index >= len(self.active_dialog.text) - 1:
-                self.text_finish = True
-            if self.char_index >= len(text) and self.__mouse_released and click_in_dialog:
+            if self.__text_index >= len(self.__active_dialog.text) - 1:
+                self.__text_finish = True
+            if self.__char_index >= len(text) and self.__mouse_released and click_in_dialog:
                 self.__mouse_released = False
-                if self.text_index < len(self.active_dialog.text) - 1:
-                    self.text_index += 1
-                    self.char_index = 0
+                if self.__text_index < len(self.__active_dialog.text) - 1:
+                    self.__text_index += 1
+                    self.__char_index = 0
 
     def __mouse_handler(self, mouse_pos: tuple[int, int], mouse_relesed: bool):
         """Обработка событий мыши
@@ -142,7 +142,7 @@ class DialogManager:
         self.__mouse_rect.x, self.__mouse_rect.y = mouse_pos
         if mouse_relesed:
             self.__mouse_released = True
-        if self.text_finish and mouse_relesed:
+        if self.__text_finish and mouse_relesed:
             self.finish_dialog()
 
     def update(self, dt: int, mouse_pos: tuple[int, int], mouse_relesed: bool) -> bool:
@@ -156,12 +156,12 @@ class DialogManager:
         Returns:
             bool: Закончен ли диалог
         """
-        self.time_last_char += dt
+        self.__time_last_char += dt
         self.__mouse_handler(mouse_pos, mouse_relesed)
-        if self.time_last_char >= self.time_to_next_char:
+        if self.__time_last_char >= self.__time_to_next_char:
             self.__draw_dialog_surface()
             self.__update_current_text()
-            self.time_last_char = 0
+            self.__time_last_char = 0
         
-        return self.text_finish
+        return self.__text_finish
 

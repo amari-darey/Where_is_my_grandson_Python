@@ -3,6 +3,7 @@ from uuid import UUID
 
 from src.world import World
 from src.camera import Camera
+from src.utils import Utils
 from src.assests_manager import AnimationAssets
 from src.components import *
 
@@ -97,6 +98,23 @@ class Systems:
                 state_component.current_state = state_component.all_states.IDLE_LEFT
             elif state_component.current_state == state_component.all_states.WALK_RIGHT:
                 state_component.current_state = state_component.all_states.IDLE_RIGHT
+
+    @staticmethod
+    def system_draw_circle_around_target(
+        world: World, 
+        camera: Camera, 
+        mouse_pos: tuple[int, int]|pygame.Vector2, 
+        window: pygame.Surface,
+        max_distanse: int = 50
+        ) -> None:
+
+        closest_entity = Utils.get_closest_enemy_to_mouse(world, camera, mouse_pos, max_distanse)
+        if closest_entity:
+            transform = world.get_component(closest_entity, ComponentTransform)
+            transform_rect = transform.rect
+            pos_x, pos_y = camera.cordinate_world_to_screen(transform_rect.center)
+            pygame.draw.circle(window, (255, 0 , 0), (pos_x, pos_y), 35, 6)
+
 
 
 
