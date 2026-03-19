@@ -4,7 +4,8 @@ from enum import Enum
 from uuid import UUID
 
 from src.assests_manager import AnimationAssets
-from src.constants import *
+from config.tiles import *
+
 
 class Utils:
     @staticmethod

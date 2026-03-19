@@ -1,11 +1,10 @@
 from uuid import UUID
-from collections import deque
 
 from src.world import World
 from src.utils import Utils
-from src.assests_manager import AnimationAssets
 from src.components import *
-from src.constants import *
+from config.entities.player import *
+from config.entities.zombie import *
 
 
 class EntityFabric:

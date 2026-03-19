@@ -3,7 +3,6 @@ import pygame
 from uuid import UUID
 from enum import Enum
 
-from src.utils import Utils
 from src.world import World
 from src.camera import Camera
 from src.systems import Systems

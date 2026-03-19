@@ -1,0 +1,1 @@
+CAMERA_SMOOTH = 0.1

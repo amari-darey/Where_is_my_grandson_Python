@@ -4,7 +4,7 @@ from uuid import uuid1, UUID
 
 from src.world import World
 from src.components import *
-from src.constants import *
+from config.tiles import *
 
 
 class TriggerManager:

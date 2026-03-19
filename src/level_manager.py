@@ -1,7 +1,7 @@
 import pygame
 import json
 import os
-from src.constants import *
+from config.paths import *
 
 
 class LevelManager:
