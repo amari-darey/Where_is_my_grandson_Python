@@ -13,16 +13,15 @@ class GameState(Enum):
 
 
 class StatePlayer(Enum):
-    IDLE_LEFT = auto()
-    IDLE_RIGHT = auto()
-    WALK_LEFT = auto()
-    WALK_RIGHT = auto()
-
+    IDLE = auto()
+    WALK= auto()
 
 class StateZombie(Enum):
-    IDLE_LEFT = auto()
-    IDLE_RIGHT = auto()
-    WALK_LEFT = auto()
-    WALK_RIGHT = auto()
-    CHAISE_LEFT = auto()
-    CHAISE_RIGHT = auto()
+    IDLE = auto()
+    WALK = auto()
+    CHASE = auto()
+    PATROL = auto()
+
+class StateDirection(Enum):
+    LEFT = auto()
+    RIGHT = auto()

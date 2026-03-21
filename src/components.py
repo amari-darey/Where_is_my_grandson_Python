@@ -3,6 +3,7 @@ from abc import ABC
 from dataclasses import dataclass
 from collections import deque
 from enum import Enum
+from uuid import UUID
 
 
 class Component(ABC): pass
@@ -24,6 +25,13 @@ class ComponentTransform(Component):
     def rect(self):
         return pygame.Rect(self.x, self.y, self.width, self.height)
     
+    @property
+    def vector(self):
+        return pygame.Vector2(self.x, self.y)
+    
+@dataclass
+class ComponentDirection(Component):
+    direction: Enum
 
 @dataclass
 class ComponentControl(Component):
@@ -63,5 +71,12 @@ class ComponentState(Component):
 
 @dataclass
 class ComponentPatrol(Component):
-    points: deque
-    
+    points: deque[tuple[int, int]]
+    point_reaching_delay: int
+    point_current_delay: int = 0
+    point_reached: bool = False
+
+@dataclass
+class ComponentChase(Component):
+    target: UUID|None
+    distanse: int

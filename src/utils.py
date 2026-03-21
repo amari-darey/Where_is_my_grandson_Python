@@ -7,6 +7,7 @@ from src.assests_manager import AnimationAssets
 from src.world import World
 from src.camera import Camera
 from src.components import ComponentEnemy, ComponentTransform
+from src.states import StateDirection
 from config.tiles import *
 
 
@@ -128,14 +129,14 @@ class Utils:
     @staticmethod
     def load_animations(entity_id: UUID, states: tuple[tuple[Enum, str, tuple[int, int], tuple[int, int], bool]]) -> None:
         assets = AnimationAssets()
-        state, path, tile_size, size, mirror = states
-        if not mirror:
+        state, path, tile_size, size, direction = states
+        if direction == StateDirection.LEFT:
             images = Utils.load_tile_set_with_scale(path, tile_size, size)
-            assets.add_asset(entity_id, state, images)
-        else:
+            assets.add_asset(entity_id, state, direction, images)
+        if direction == StateDirection.RIGHT:
             images = Utils.load_tile_set_with_scale(path, tile_size, size)
             images = Utils.mirror_images(path, images)
-            assets.add_asset(entity_id, state, images)
+            assets.add_asset(entity_id, state, direction, images)
 
     @staticmethod
     def tiles_pos_to_world(tile_pos: tuple[int, int]) -> tuple[int, int]:

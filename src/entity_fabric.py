@@ -5,6 +5,7 @@ from src.utils import Utils
 from src.components import *
 from config.entities.player import *
 from config.entities.zombie import *
+from random import randint
 
 
 class EntityFabric:
@@ -39,6 +40,7 @@ class EntityFabric:
             entity,
             ComponentPlayer(),
             ComponentTransform(*entyti_pos, *PLAYER_SIZE),
+            ComponentDirection(StateDirection.RIGHT),
             ComponentControl(pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d, pygame.K_SPACE),
             ComponentSpeed(PLAYER_SPEED),
             ComponentImage(entity_animation[0]),
@@ -53,7 +55,7 @@ class EntityFabric:
         return entity
     
     @staticmethod
-    def create_zombie(world: World, pos: tuple[int, int]) -> UUID:
+    def create_zombie(world: World, pos: tuple[int, int], patrol: tuple[tuple[int, int]]|None = None) -> UUID:
         """Создание зомби
 
         Components entered:
@@ -73,15 +75,26 @@ class EntityFabric:
         """
         entity = world.create_entity()
         entyti_pos = Utils.tiles_pos_to_world(pos)
+        if patrol:
+            patrol_points = [Utils.tiles_pos_to_world(point) for point in patrol]
+        else:
+            patrol_points = [
+                Utils.tiles_pos_to_world((max(0, pos[0] + randint(-3, 3)), max(0, pos[1] + randint(-3, 3))))
+                for _ in range(randint(3, 6))
+            ]
         entity_animation = Utils.load_tile_set_with_scale(ZOMBIE_IDLE_IMG, ZOMBIE_IDLE_TILESET_SIZE, ZOMBIE_SIZE)
         world.add_component(
             entity,
             ComponentEnemy(),
             ComponentZombie(),
             ComponentTransform(*entyti_pos, *ZOMBIE_SIZE),
+            ComponentDirection(StateDirection.LEFT),
             ComponentImage(entity_animation[0]),
             ComponentAnimation(ZOMBIE_ANIMATION_FRAME_RATE, 0),
-            ComponentState(ZOMBIE_START_STATE, None, type(ZOMBIE_START_STATE))
+            ComponentState(ZOMBIE_START_STATE, None, type(ZOMBIE_START_STATE)),
+            ComponentSpeed(ZOMBIE_SPEED),
+            ComponentPatrol(deque(patrol_points), 1200),
+            ComponentChase(None, ZOMBIE_CHASE_DISTANCE)
         )
 
         for state in ZOMBIE_STATES:
