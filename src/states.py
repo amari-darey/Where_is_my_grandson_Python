@@ -1,24 +1,28 @@
-from enum import Enum
+from enum import Enum, auto
 
 
 class AppState(Enum):
-    RUN = 1
-    CLOSE = 0
+    RUN = auto()
+    CLOSE = auto()
 
 
 class GameState(Enum):
-    RUN = 1
-    PAUSE = 0
-    DIALOG = 2
+    RUN = auto()
+    PAUSE = auto()
+    DIALOG = auto()
 
 
 class StatePlayer(Enum):
-    IDLE_LEFT = 0
-    IDLE_RIGHT = 1
-    WALK_LEFT = 2
-    WALK_RIGHT = 3
+    IDLE_LEFT = auto()
+    IDLE_RIGHT = auto()
+    WALK_LEFT = auto()
+    WALK_RIGHT = auto()
 
 
 class StateZombie(Enum):
-    IDLE_LEFT = 0
-    IDLE_RIGHT = 1
+    IDLE_LEFT = auto()
+    IDLE_RIGHT = auto()
+    WALK_LEFT = auto()
+    WALK_RIGHT = auto()
+    CHAISE_LEFT = auto()
+    CHAISE_RIGHT = auto()

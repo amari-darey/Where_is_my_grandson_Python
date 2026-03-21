@@ -1,6 +1,7 @@
 import pygame
 from typing import Callable, Any
 from uuid import uuid1, UUID
+from functools import partial
 
 from src.world import World
 from src.components import *
@@ -40,15 +41,14 @@ class TriggerManager:
 
     def create_touch_trigger(
             self, pos: tuple[int, int], size: tuple[int, int], 
-            callback: Callable, parametrs: tuple[Any], entity_type: tuple[Component], repeat: bool
+            callback: partial, entity_type: tuple[Component], repeat: bool
             ) -> UUID:
         """Создание триггер зоны
 
         Args:
             pos (tuple[int, int]): Позиция треггера в тайлах
             size (tuple[int, int]): Размер триггера в тайлах
-            callback (Callable): Коллбэк, который будет вызван при срабатывании
-            parametrs (tuple[Any]): Параметры которые будут переданны в Коллбэк
+            callback (partial): Коллбэк, который будет вызван при срабатывании
             entity_type (tuple[Component]): Кортеж с типами сущностей которые могут вызвать триггер
             repeat (bool): Удаляется ли триггер после срабатывания
 
@@ -68,20 +68,18 @@ class TriggerManager:
         self.__triggers["touch"][trigger_id] = {
             "rect": trigger_rect,
             "callback": callback,
-            "param": parametrs,
             "allow_entity": entity_type,
             "repeat": repeat
         }
 
         return trigger_id
 
-    def create_time_trigger(self, time: int, callback: Callable, parametrs: tuple[Any]) -> UUID:
+    def create_time_trigger(self, time: int, callback: partial) -> UUID:
         """Создание триггера по времени
 
         Args:
             time (int): Время в миллисекундах с начала игры, когда должен сработать триггер
-            callback (Callable): Коллбэк, который будет вызван при срабатывании
-            parametrs (tuple[Any]): Параметры которые будут переданны в Коллбэк
+            callback (partial): Коллбэк, который будет вызван при срабатывании
 
         Returns:
             UUID: id триггера
@@ -90,7 +88,6 @@ class TriggerManager:
         self.__triggers["time"][trigger_id] = {
             "time": time,
             "callback": callback,
-            "param": parametrs,
             "repeat": False
         }
 
@@ -132,7 +129,7 @@ class TriggerManager:
             trigger = self.__triggers[trigger_key][id]
         else:
             trigger = self.__triggers[trigger_key].pop(id)
-        trigger["callback"](*trigger["param"])
+        trigger["callback"]()
 
     def __check_trigger_rect(self, trigger_id: UUID, world: World) -> bool:
         """Проверка столновения ректа триггера с ректом подходящих сущностей

@@ -1,4 +1,5 @@
 import os
+from functools import partial
 from src.world import World
 from src.game import Game
 from src.utils import Utils
@@ -31,16 +32,14 @@ def setup_event(world: World, game: Game):
     game.trigger.create_touch_trigger(
         (2, 2), 
         (0.2, 0.2), 
-        lambda: game.dialog.run_dialog(dialog_id), 
-        (), 
+        partial(lambda: game.dialog.run_dialog(dialog_id)), 
         (ComponentPlayer, ), 
         False
         )
     game.trigger.create_touch_trigger(
         (3, 3), 
         (0.5, 0.5), 
-        lambda: [EntityFabric.create_zombie(world, (x, 4)) for x in range(5)], 
-        (), 
+        partial(lambda: [EntityFabric.create_zombie(world, (x, 4)) for x in range(5)]), 
         (ComponentPlayer, ), 
         False
         )

@@ -60,3 +60,8 @@ class ComponentState(Component):
     current_state: Enum
     previous_state: Enum
     all_states: Enum
+
+@dataclass
+class ComponentPatrol(Component):
+    points: deque
+    
