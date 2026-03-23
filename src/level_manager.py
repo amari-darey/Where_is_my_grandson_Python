@@ -13,11 +13,12 @@ class LevelManager:
     """
     def __init__(self):
         self.__levels = {}
+        self.__current_level = None
 
         self.__load_local_levels()
 
     def __load_local_levels(self) -> None:
-        """Загрузка уровней из стандартной папки Path_to_game/levels
+        """Загрузка уровней из стандартной папки Path_to_game/levels/
         """
         if os.path.exists(LEVELS_PATH):
             for level in os.listdir(LEVELS_PATH):
@@ -33,6 +34,7 @@ class LevelManager:
             Имя уровня не совпадает с ранее загруженными  
             Уровень имеет ключ layers  
                 По ключу layers есть ключ base  
+            Размер всех слоёв одинаков
             Уровень имеет ключ player_start_pos  
 
         Args:
@@ -48,9 +50,27 @@ class LevelManager:
         check_list.append(layers)
         if layers:
             check_list.append(level["layers"].get("base"))
+        row_legth = 0
+        for layer_name in level["layers"]:
+            for index, layer_map in enumerate(level["layers"][layer_name]):
+                if row_legth == 0:
+                    row_legth = len(layer_map)
+                if len(layer_map) == row_legth:
+                    check_list.append(True)
+                else:
+                    check_list.append(False)
+                    print(f"[Map Error]\n\t layer {layer_name} имеет {len(layer_map)} элементов вместо {row_legth} на строке {index + 1}")
+
         check_list.append(level.get("player_start_pos"))
         return all(check_list)
     
+    def set_current_level(self, level_name: str):
+        if level_name in self.__levels:
+            self.__current_level = level_name
+    
+    def get_current_level_map(self) -> dict:
+        return self.__levels[self.__current_level]["layers"]
+
     def get_map(self, level_name: str) -> dict:
         return self.__levels[level_name]["layers"]
     

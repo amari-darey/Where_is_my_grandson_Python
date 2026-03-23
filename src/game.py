@@ -72,6 +72,8 @@ class Game:
                 Systems.system_draw_circle_around_target(self.world, self.camera, mouse_pos, self.window)
                 Systems.system_patrol_update(self.world, self.dt)
                 Systems.system_patrol_move(self.world, self.dt)
+                Systems.system_collision_separator(self.world)
+                Systems.system_move(self.world)
                 Systems.system_change_zombie_state(self.world, self.player_id)
 
             if self.game_state == GameState.DIALOG:

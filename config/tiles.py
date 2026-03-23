@@ -15,6 +15,21 @@ TILES = {
     "11.2": "tests/test_tile_11.2.png",
     "11.3": "tests/test_tile_11.3.png",
     "11.4": "tests/test_tile_11.4.png",
-    "12": "tests/test_tile_12.png"
+    "11.5": "tests/test_tile_11.5.png",
+    "11.6": "tests/test_tile_11.6.png",
+    "11.7": "tests/test_tile_11.7.png",
+    "11.8": "tests/test_tile_11.8.png",
+    "12": "tests/test_tile_12.png",
+    "13": "tests/test_tile_13.png",
+    "13.1": "tests/test_tile_13.1.png",
+    "13.2": "tests/test_tile_13.2.png",
+    "13.3": "tests/test_tile_13.3.png",
+    "13.4": "tests/test_tile_13.4.png",
+    "13.5": "tests/test_tile_13.5.png",
+    "13.6": "tests/test_tile_13.6.png",
+    "13.7": "tests/test_tile_13.7.png",
+    "13.8": "tests/test_tile_13.8.png",
+    "14": "tests/test_small_obj.png",
+    "14.1": "tests/test_small_obj1.png",
 }
 TILE_SIZE = 128

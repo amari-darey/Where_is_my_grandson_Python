@@ -28,6 +28,10 @@ class ComponentTransform(Component):
     @property
     def vector(self):
         return pygame.Vector2(self.x, self.y)
+
+    @property
+    def center_vector(self):
+        return pygame.Vector2(self.x + self.width//2, self.y+ self.height//2)
     
 @dataclass
 class ComponentDirection(Component):
@@ -40,7 +44,6 @@ class ComponentControl(Component):
     down: int
     right: int
     attack: int
-
 
 @dataclass
 class ComponentImage(Component):
@@ -62,6 +65,15 @@ class ComponentAnimation(Component):
 @dataclass
 class ComponentSpeed(Component):
     speed: int
+
+@dataclass
+class ComponentVelocity(Component):
+    dx: float
+    dy: float
+
+@dataclass
+class ComponentCollision(Component): 
+    min_distance: int
 
 @dataclass
 class ComponentState(Component):

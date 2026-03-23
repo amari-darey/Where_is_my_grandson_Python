@@ -16,6 +16,10 @@ def setup_game(world: World) -> tuple:
     player_id = EntityFabric.create_player(world, PLAYER_POS)
     EntityFabric.create_zombie(world, ZOMBIE_POS)
 
+    for row in range(10, 21):
+        for col in range(10, 21):
+            EntityFabric.create_zombie(world, (row, col))
+
     level_manager = LevelManager()
     levels = level_manager.get_levels_name()
     game_map = Utils.create_map(level_manager.get_map(levels[0]))
@@ -29,10 +33,22 @@ def setup_event(world: World, game: Game):
         player_id, 
         ("Упс... В говно наступил...", "Ну что за день такой")
         )
+    dialog2_id = game.dialog.add_dialog(
+        world, 
+        player_id, 
+        ("Похоже тут должен был быть мой дом...", "Но его пока не нарисовали")
+        )
     game.trigger.create_touch_trigger(
         (2, 2), 
         (0.2, 0.2), 
         partial(lambda: game.dialog.run_dialog(dialog_id)), 
+        (ComponentPlayer, ), 
+        False
+        )
+    game.trigger.create_touch_trigger(
+        (1, 14), 
+        (5, 5), 
+        partial(lambda: game.dialog.run_dialog(dialog2_id)), 
         (ComponentPlayer, ), 
         False
         )

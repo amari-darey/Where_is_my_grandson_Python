@@ -22,6 +22,8 @@ class EntityFabric:
             ComponentDialog
             ComponentAnimation
             ComponentState
+            ComponentVelocity
+            ComponentCollision
 
         Args:
             world (World): Экземпляр класса World
@@ -46,7 +48,9 @@ class EntityFabric:
             ComponentImage(entity_animation[0]),
             ComponentDialog(PLAYER_NAME, entity_dialog_image),
             ComponentAnimation(PLAYER_ANIMATION_FRAME_RATE, 0),
-            ComponentState(PLAYER_START_STATE, None, type(PLAYER_START_STATE))
+            ComponentState(PLAYER_START_STATE, None, type(PLAYER_START_STATE)),
+            ComponentVelocity(0, 0),
+            ComponentCollision(PLAYER_MIN_DISTANCE)
         )
 
         for state in PLAYER_STATES:
@@ -65,6 +69,11 @@ class EntityFabric:
             ComponentImage
             ComponentAnimation
             ComponentState
+            ComponentSpeed
+            ComponentPatrol
+            ComponentChase
+            ComponentVelocity
+            ComponentCollision
 
         Args:
             world (World): Экземпляр класса World
@@ -94,7 +103,9 @@ class EntityFabric:
             ComponentState(ZOMBIE_START_STATE, None, type(ZOMBIE_START_STATE)),
             ComponentSpeed(ZOMBIE_SPEED),
             ComponentPatrol(deque(patrol_points), 1200),
-            ComponentChase(None, ZOMBIE_CHASE_DISTANCE)
+            ComponentChase(None, ZOMBIE_CHASE_DISTANCE),
+            ComponentVelocity(0, 0),
+            ComponentCollision(ZOMBIE_MIN_DISTANCE)
         )
 
         for state in ZOMBIE_STATES:

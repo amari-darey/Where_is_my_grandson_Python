@@ -70,12 +70,19 @@ class Systems:
             dt (int): количество миллисекунд с последнего кадра
         """
         dt = dt / 1000
-        entity = world.get_single_entity_with_all(ComponentTransform, ComponentPlayer, ComponentControl, ComponentState)
+        entity = world.get_single_entity_with_all(
+            ComponentTransform, 
+            ComponentPlayer, 
+            ComponentControl, 
+            ComponentState, 
+            ComponentVelocity
+            )
         control_component = world.get_component(entity, ComponentControl)
         transform_component = world.get_component(entity, ComponentTransform)
         speed_component = world.get_component(entity, ComponentSpeed)
         state_component = world.get_component(entity, ComponentState)
         direction_component = world.get_component(entity, ComponentDirection)
+        velocity_component = world.get_component(entity, ComponentVelocity)
         dx = dy = 0
         if key[control_component.left]:
             dx -= speed_component.speed * dt
@@ -86,8 +93,8 @@ class Systems:
         if key[control_component.down]:
             dy += speed_component.speed * dt
 
-        transform_component.x += dx
-        transform_component.y += dy
+        velocity_component.dx = dx
+        velocity_component.dy = dy
         
         if dx > 0:
             direction_component.direction = StateDirection.RIGHT
@@ -131,12 +138,19 @@ class Systems:
     @staticmethod
     def system_patrol_move(world: World, dt: int) -> None:
         dt = dt / 1000
-        entities = world.get_entities_with_all(ComponentPatrol, ComponentTransform, ComponentSpeed, ComponentDirection)
+        entities = world.get_entities_with_all(
+            ComponentPatrol, 
+            ComponentTransform, 
+            ComponentSpeed, 
+            ComponentDirection,
+            ComponentVelocity
+            )
         for entity in entities:
             patrol = world.get_component(entity, ComponentPatrol)
             transform = world.get_component(entity, ComponentTransform)
             if not patrol.point_reached:
                 speed = world.get_component(entity, ComponentSpeed).speed
+                velocity = world.get_component(entity, ComponentVelocity)
                 direction = world.get_component(entity, ComponentDirection)
                 point_x, point_y = patrol.points[0]
                 dx, dy = 0, 0
@@ -150,8 +164,8 @@ class Systems:
                     direction.direction = StateDirection.RIGHT
                 if dx < 0:
                     direction.direction = StateDirection.LEFT
-                transform.x += dx
-                transform.y += dy
+                velocity.dx = dx
+                velocity.dy = dy
                 if transform.rect.collidepoint(point_x, point_y):
                     patrol.point_reached = True
 
@@ -171,5 +185,74 @@ class Systems:
                 zombie_chase.target = None
                 zombie_state.previous_state = zombie_state.current_state
                 zombie_state.current_state = StateZombie.PATROL
+
+    @staticmethod
+    def system_move(world: World):
+        entities = world.get_entities_with_all(ComponentTransform, ComponentVelocity)
+        for entity in entities:
+            entity_velocity = world.get_component(entity, ComponentVelocity)
+            entity_transform = world.get_component(entity, ComponentTransform)
+
+            entity_transform.x += entity_velocity.dx
+            entity_transform.y += entity_velocity.dy
+
+            entity_velocity.dx = 0
+            entity_velocity.dy = 0
+
+    @staticmethod
+    def system_collision_separator(world: World):
+        """Система отталкивания
+        Если слущности сойдутся ближе суммы их ComponentCollision.min_distance 
+        они оттолкнутся друг от друга пропорционально их пересечению
+
+        Args:
+            world (World): Экземпляр класса World
+        """
+        entities = world.get_entities_with_all(
+            ComponentTransform, 
+            ComponentVelocity, 
+            ComponentCollision
+            )
+        for index, entity in enumerate(entities):
+            transform = world.get_component(entity, ComponentTransform)
+            velocity = world.get_component(entity, ComponentVelocity)
+            collision = world.get_component(entity, ComponentCollision)
+            for other_entity in range(index + 1, len(entities)):
+                other_transform = world.get_component(entities[other_entity], ComponentTransform)
+                other_velocity = world.get_component(entities[other_entity], ComponentVelocity)
+                other_collision = world.get_component(entities[other_entity], ComponentCollision)
+
+                vel = transform.center_vector - other_transform.center_vector
+                distance_square = vel.x * vel.x + vel.y * vel.y
+
+                if distance_square == 0: continue
+
+                min_distance = collision.min_distance + other_collision.min_distance
+                min_distance_square = min_distance * min_distance
+
+                if distance_square < min_distance_square:
+                    distance = distance_square ** 0.5
+                    new_x = vel.x / distance
+                    new_y = vel.y / distance
+
+                    dot1 = velocity.dx * new_x + velocity.dy * new_y
+                    if dot1 > 0:
+                        velocity.dx -= new_x * dot1
+                        velocity.dy -= new_y * dot1
+
+                    dot2 = other_velocity.dx * (-new_x) + other_velocity.dy * (-new_y)
+                    if dot2 > 0:
+                        other_velocity.dx -= new_x * dot2
+                        other_velocity.dy -= new_y * dot2
+
+                    overlap = min_distance - distance
+
+                    push_x = new_x * overlap * 0.5
+                    push_y = new_y * overlap * 0.5
+
+                    velocity.dx += push_x
+                    velocity.dy += push_y
+                    other_velocity.dx -= push_x
+                    other_velocity.dy -= push_y
 
 

@@ -89,6 +89,8 @@ class DialogManager:
         self.__text_index = 0
         self.__char_index = 0
         self.__time_last_char = 0
+        self.__text_finish = False
+        self.__mouse_released = False
 
     def draw(self, window: pygame.Surface):
         """Отрисовка диалога на экране
