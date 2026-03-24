@@ -1,7 +1,7 @@
-import pygame
 import json
 import os
 from config.paths import *
+from src.map_manager import Map
 
 
 class LevelManager:
@@ -16,6 +16,8 @@ class LevelManager:
         self.__current_level = None
 
         self.__load_local_levels()
+
+        self.map_manager = Map()
 
     def __load_local_levels(self) -> None:
         """Загрузка уровней из стандартной папки Path_to_game/levels/
@@ -64,6 +66,12 @@ class LevelManager:
         check_list.append(level.get("player_start_pos"))
         return all(check_list)
     
+    def load_level(self, level_name: str):
+        self.map_manager.load_new_map(self.__levels[level_name])
+    
+    def get_game_map(self):
+        return self.map_manager.get_current_map()
+
     def set_current_level(self, level_name: str):
         if level_name in self.__levels:
             self.__current_level = level_name

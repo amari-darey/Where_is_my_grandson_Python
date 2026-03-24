@@ -38,6 +38,10 @@ class ComponentDirection(Component):
     direction: Enum
 
 @dataclass
+class ComponentMapPosition(Component):
+    position: tuple[int, int]
+
+@dataclass
 class ComponentControl(Component):
     up: int
     left: int

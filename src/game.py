@@ -9,18 +9,18 @@ from src.systems import Systems
 from src.assests_manager import AnimationAssets
 from src.trigger_manager import TriggerManager
 from src.dialog_manager import DialogManager
+from src.level_manager import LevelManager
 from src.states import AppState, GameState
 from src.components import *
 
 
 class Game:
     def __init__(
-            self, world: World, assets: AnimationAssets, 
-            screen_size: tuple[int, int], tick_rate: int, 
-            game_map: tuple[tuple], player_id: UUID
+            self, world: World, screen_size: tuple[int, int], 
+            tick_rate: int
             ):
         self.world = world
-        self.assets = assets
+        self.assets = AnimationAssets()
         self.trigger = TriggerManager()
         self.dialog = DialogManager(None, self.change_game_state)
         self.__screen_size = screen_size
@@ -28,12 +28,16 @@ class Game:
 
         self.window = None
         self.timer = None
+        
+        self.level_manager = LevelManager()
+        self.current_level_name = self.level_manager.get_levels_name()[0] # затычка. временно
+        self.level_manager.load_level(self.current_level_name)
+        self.map = self.level_manager.get_game_map()
 
-        self.map = game_map
         self.camera = Camera(0, 0, *self.__screen_size)
         self.dt = 0
 
-        self.player_id = player_id
+        self.player_id = None
 
         self.app_state = AppState.RUN
         self.game_state = GameState.RUN
@@ -47,6 +51,10 @@ class Game:
     
     def change_game_state(self, state: Enum) -> None:
         self.game_state = state
+    
+    def identify_player(self):
+        self.player_id = self.world.get_single_entity_with_all(ComponentPlayer)
+        if not self.player_id: raise ValueError("Игра не может быть запущена без игрока")
 
     def run(self) -> None:
         while self.app_state == AppState.RUN:
