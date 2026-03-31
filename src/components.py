@@ -38,7 +38,7 @@ class ComponentDirection(Component):
     direction: Enum
 
 @dataclass
-class ComponentMapPosition(Component):
+class ComponentNavMeshMapPosition(Component):
     position: tuple[int, int]
 
 @dataclass
@@ -90,9 +90,13 @@ class ComponentPatrol(Component):
     points: deque[tuple[int, int]]
     point_reaching_delay: int
     point_current_delay: int = 0
-    point_reached: bool = False
+    point_reached: bool = True
 
 @dataclass
 class ComponentChase(Component):
     target: UUID|None
     distanse: int
+
+@dataclass
+class ComponentPath(Component):
+    path: list[tuple[int, int]]

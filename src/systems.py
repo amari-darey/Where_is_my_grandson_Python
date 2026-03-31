@@ -1,12 +1,14 @@
 import pygame
 from uuid import UUID
 
+from src.map_manager import Map
 from src.world import World
 from src.camera import Camera
 from src.utils import Utils
 from src.assests_manager import AnimationAssets
 from src.components import *
 from src.states import *
+from config.tiles import TILE_SIZE
 
 
 class Systems:
@@ -124,50 +126,39 @@ class Systems:
             pygame.draw.circle(window, (255, 0 , 0), (pos_x, pos_y), 35, 6)
 
     @staticmethod
-    def system_patrol_update(world: World, dt: int) -> None:
-        entities = world.get_entities_with_all(ComponentPatrol)
+    def system_patrol_update(world: World, map_manager: Map, dt: int) -> None:
+        entities = world.get_entities_with_all(ComponentPatrol, ComponentPath, ComponentTransform)
         for entity in entities:
             patrol = world.get_component(entity, ComponentPatrol)
+            path = world.get_component(entity, ComponentPath)
             if patrol.point_reached:
                 patrol.point_current_delay += dt
                 if patrol.point_current_delay >= patrol.point_reaching_delay:
                     patrol.points.rotate(1)
                     patrol.point_current_delay = 0
                     patrol.point_reached = False
+                    transform = world.get_component(entity, ComponentTransform)
+                    path_to_point = map_manager.get_path_to_point((transform.x, transform.y), patrol.points[0])
+                    if path_to_point:    
+                        path.path = path_to_point
 
     @staticmethod
-    def system_patrol_move(world: World, dt: int) -> None:
-        dt = dt / 1000
+    def system_patrol_update_point_reached(world: World) -> None:
         entities = world.get_entities_with_all(
             ComponentPatrol, 
-            ComponentTransform, 
-            ComponentSpeed, 
-            ComponentDirection,
-            ComponentVelocity
+            ComponentTransform,
+            ComponentState
             )
         for entity in entities:
-            patrol = world.get_component(entity, ComponentPatrol)
-            transform = world.get_component(entity, ComponentTransform)
-            if not patrol.point_reached:
-                speed = world.get_component(entity, ComponentSpeed).speed
-                velocity = world.get_component(entity, ComponentVelocity)
-                direction = world.get_component(entity, ComponentDirection)
-                point_x, point_y = patrol.points[0]
-                dx, dy = 0, 0
-                step = speed * dt
-                dx_to_target = point_x - transform.x
-                dy_to_target = point_y - transform.y
-
-                dx = max(-step, min(step, dx_to_target))
-                dy = max(-step, min(step, dy_to_target))
-                if dx > 0:
-                    direction.direction = StateDirection.RIGHT
-                if dx < 0:
-                    direction.direction = StateDirection.LEFT
-                velocity.dx = dx
-                velocity.dy = dy
-                if transform.rect.collidepoint(point_x, point_y):
-                    patrol.point_reached = True
+            state = world.get_component(entity, ComponentState)
+            if state.current_state in (StateZombie.PATROL, ):
+                patrol = world.get_component(entity, ComponentPatrol)
+                if not patrol.point_reached:
+                    transform = world.get_component(entity, ComponentTransform)
+                    point_map_position = Map.world_to_tile(patrol.points[0])
+                    entity_map_position = Map.world_to_tile((transform.x, transform.y))
+                    if entity_map_position == point_map_position:
+                        patrol.point_reached = True
 
     @staticmethod
     def system_change_zombie_state(world: World, player: UUID):
@@ -198,6 +189,40 @@ class Systems:
 
             entity_velocity.dx = 0
             entity_velocity.dy = 0
+
+    @staticmethod
+    def system_enemy_move(world: World, dt: int):
+        dt = dt / 1000
+        entities = world.get_entities_with_all(ComponentTransform, ComponentVelocity, ComponentPath)
+        for entity in entities:
+            path = world.get_component(entity, ComponentPath)
+            
+            if not path.path: continue
+            transform = world.get_component(entity, ComponentTransform)
+            velocity = world.get_component(entity, ComponentVelocity)
+            speed = world.get_component(entity, ComponentSpeed).speed
+            direction = world.get_component(entity, ComponentDirection)
+            step = speed * dt
+            rect_center = transform.center_vector
+            path_point = path.path[0]
+            tile_size = TILE_SIZE//2
+            target_center = pygame.Vector2(path_point[0] + tile_size, path_point[1] + tile_size)
+            direction_vector = target_center - rect_center
+            if direction_vector.length() < step:
+                path.path.pop(0)
+                velocity.dx = 0
+                velocity.dy = 0
+                continue
+
+            direction_vector = direction_vector.normalize()
+
+            velocity.dx = direction_vector.x * step
+            velocity.dy = direction_vector.y * step
+
+            if direction_vector.x > 0:
+                direction.direction = StateDirection.RIGHT
+            if direction_vector.x < 0:
+                direction.direction = StateDirection.LEFT
 
     @staticmethod
     def system_collision_separator(world: World):
@@ -254,5 +279,3 @@ class Systems:
                     velocity.dy += push_y
                     other_velocity.dx -= push_x
                     other_velocity.dy -= push_y
-
-

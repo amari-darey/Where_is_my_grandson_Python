@@ -1,7 +1,10 @@
+from functools import partial
 import json
 import os
-from config.paths import *
+from src.components import ComponentPlayer
+from src.entity_fabric import EntityFabric
 from src.map_manager import Map
+from config.paths import *
 
 
 class LevelManager:
@@ -11,7 +14,8 @@ class LevelManager:
             Собирать только имена уровней
             Сделать метод загрузки уровня и убирать предыдуший
     """
-    def __init__(self):
+    def __init__(self, game):
+        self.game = game
         self.__levels = {}
         self.__current_level = None
 
@@ -24,7 +28,7 @@ class LevelManager:
         """
         if os.path.exists(LEVELS_PATH):
             for level in os.listdir(LEVELS_PATH):
-                with open(os.path.join(LEVELS_PATH, level)) as level:
+                with open(os.path.join(LEVELS_PATH, level), "r", encoding="utf-8") as level:
                     data = json.load(level)
                     if self.__check_level(data):
                         self.__levels[data["name"]] = data
@@ -62,12 +66,38 @@ class LevelManager:
                 else:
                     check_list.append(False)
                     print(f"[Map Error]\n\t layer {layer_name} имеет {len(layer_map)} элементов вместо {row_legth} на строке {index + 1}")
-
+        check_list.append(level.get("events"))
         check_list.append(level.get("player_start_pos"))
         return all(check_list)
     
     def load_level(self, level_name: str):
         self.map_manager.load_new_map(self.__levels[level_name])
+        self.create_events(self.__levels[level_name]["events"])
+
+    def create_events(self, events: dict):
+        for event in events["touch"]:
+            if event["type"] == "dialog":
+                if event["triggerComponent"]:
+                    dialog_id = self.game.dialog.add_dialog(
+                        self.game.world,
+                        self.game.player_id,
+                        event['content']
+                    )
+                    self.game.trigger.create_touch_trigger(
+                        event["pos"],
+                        event["size"],
+                        partial(lambda dialog_id=dialog_id: self.game.dialog.run_dialog(dialog_id)),
+                        (ComponentPlayer, ),
+                        event["repeat"]
+                    )
+            if event["type"] == "create":
+                self.game.trigger.create_touch_trigger(
+                        event["pos"],
+                        event["size"],
+                        partial(lambda: [EntityFabric.create_zombie(self.game.world, (x, 4)) for x in range(5)]),
+                        (ComponentPlayer, ),
+                        event["repeat"]
+                    )
     
     def get_game_map(self):
         return self.map_manager.get_current_map()

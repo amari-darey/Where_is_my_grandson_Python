@@ -10,25 +10,25 @@ from config.tiles import TILE_SIZE, TILES
 class Map:
     def __init__(self):
         self.game_map = None
-        self.collision_map = None
+        self.nav_mesh_map = None
 
-    def __create_collision_map(self, game_map: pygame.Surface) -> list[list[str]]:
+    def __create_nav_mesh_map(self, game_map: pygame.Surface) -> list[list[UUID | bool | None]]:
         """Создание базовой пустой карты
 
         Args:
-            map_size (tuple[int, int]): Размер карты
+            game_map (pygame.Surface): Игровая карта. С неё будет снят размер
 
         Returns:
             list[list[str]]: Карта
         """
-        map_size = self.cordinate_to_pos(game_map.get_size())
-        owner_map = []
+        map_size = self.world_to_tile(game_map.get_size())
+        nav_mesh_map = []
         for _ in range(map_size[0]):
             row = []
             for _ in range(map_size[1]):
-                row.append("0")
-            owner_map.append(row)
-        return owner_map
+                row.append(None)
+            nav_mesh_map.append(row)
+        return nav_mesh_map
     
     def __create_map(self, game_map: dict[str, tuple[tuple[str]]]) -> pygame.Surface:
         """Создание карты
@@ -56,9 +56,9 @@ class Map:
     
     def load_new_map(self, game_map: dict[str, tuple[tuple[str]]]):
         self.game_map = self.__create_map(game_map)
-        self.collision_map = self.__create_collision_map(self.game_map)
+        self.nav_mesh_map = self.__create_nav_mesh_map(self.game_map)
 
-    def add_to_map(self, position: tuple[int, int], entity_id: Optional[UUID] = None) -> tuple[int, int]|bool:
+    def add_to_map(self, position: tuple[int, int]) -> tuple[int, int]|None:
         """Добавляет объекты на карту  
         Если не был передан entity_id то будет добавлен как статичный объект
 
@@ -67,19 +67,24 @@ class Map:
             entity_id (Optional[UUID], optional): id сущности. Defaults to None.
 
         Returns:
-            tuple[int, int]|bool: Позиция на карте, либо False если добавление не возможно
+            tuple[int, int]|None: Позиция на карте, либо False если добавление не возможно
         """
 
-        x, y = self.cordinate_to_pos(position)
-        if y < 0 or y >= len(self.collision_map): return False
-        if x < 0 or x >= len(self.collision_map[y]): return False
+        x, y = self.world_to_tile(position)
+        if y < 0 or y >= len(self.nav_mesh_map): return
+        if x < 0 or x >= len(self.nav_mesh_map[y]): return
+        if self.nav_mesh_map[y][x] != None: return
 
-        if self.collision_map[y][x] == "0":
-            self.collision_map[y][x] = entity_id if entity_id else "1"
-            return True
+        self.nav_mesh_map[y][x] = False
 
         return x, y
             
+    def get_path_to_point(self, entity_pos: tuple[int, int], target_pos: tuple[int, int]) -> list|bool:
+        entity_pos = self.world_to_tile(entity_pos)
+        target_pos = self.world_to_tile(target_pos)
+        if self.nav_mesh_map[target_pos[1]][target_pos[0]] == None:
+            return self.__get_path_to_target(entity_pos, target_pos)
+        return False
     
     def get_path_to_entity(self, entity_pos: tuple[int, int], target_pos: tuple[int, int]) -> list|bool:
         """Расчитывает путь до сущности  
@@ -99,8 +104,8 @@ class Map:
         Returns:
             list|bool: Список точек маршрута либо False если путь не найден
         """
-        entity_pos = self.cordinate_to_pos(entity_pos)
-        target_pos = self.cordinate_to_pos(target_pos)
+        entity_pos = self.world_to_tile(entity_pos)
+        target_pos = self.world_to_tile(target_pos)
 
         points = (
             (target_pos[0], target_pos[1]-1),
@@ -114,7 +119,7 @@ class Map:
         )
         alavible_point = None
         for x, y in points:
-            if self.collision_map[y][x] == "0":
+            if self.nav_mesh_map[y][x] == None:
                 alavible_point = (x, y)
                 break
         return self.__get_path_to_target(entity_pos, alavible_point) if alavible_point else False
@@ -130,7 +135,7 @@ class Map:
             list|bool: Список точек пути в глобальных кординатах или False если путь не найден
         """
         heuristic = lambda point_a, point_b: abs(point_a[0] - point_b[0]) + abs(point_a[1] - point_b[1])
-        is_walkable = lambda x, y: self.collision_map[y][x] == "0"
+        is_walkable = lambda x, y: self.nav_mesh_map[y][x] == None
 
         open_heap = []
         heappush(open_heap, (0, entity_pos))
@@ -153,7 +158,7 @@ class Map:
                     current = came_from[current]
                 path.append(entity_pos)
                 path.reverse()
-                return [self.pos_to_cordinate(point) for point in path]
+                return [self.tile_to_world(point) for point in path]
             
             x, y = current
             neighbors = [
@@ -185,7 +190,7 @@ class Map:
         return self.game_map
 
     @staticmethod
-    def cordinate_to_pos(pos: tuple[int, int]) -> tuple[int, int]:
+    def world_to_tile(pos: tuple[int, int]) -> tuple[int, int]:
         """Превращает глобальные кординаты в позицию на карте
 
         Args:
@@ -195,7 +200,7 @@ class Map:
             ``` python
                 # При TILE_SIZE == 128
                 pos = (1432, 567)  
-                map_pos = Map.cordinate_to_pos(pos)  
+                map_pos = Map.world_to_tile(pos)  
                 print(map_pos) #(11, 4)
             ```
 
@@ -205,7 +210,7 @@ class Map:
         return (int(round(pos[0]/TILE_SIZE, 0)), int(round(pos[1]/TILE_SIZE, 0)))
     
     @staticmethod
-    def pos_to_cordinate(pos: tuple[int, int]) -> tuple[int, int]:
+    def tile_to_world(pos: tuple[int, int]) -> tuple[int, int]:
         """Превращает позацию на карте в глобальные кординаты
 
         Args:
@@ -215,7 +220,7 @@ class Map:
             ``` python
                 # При TILE_SIZE == 128
                 pos = (11, 4)  
-                map_pos = Map.pos_to_cordinate(pos)  
+                map_pos = Map.tile_to_world(pos)  
                 print(map_pos) #(1408, 512)
             ```
 

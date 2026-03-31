@@ -29,15 +29,16 @@ class Game:
         self.window = None
         self.timer = None
         
-        self.level_manager = LevelManager()
-        self.current_level_name = self.level_manager.get_levels_name()[0] # затычка. временно
-        self.level_manager.load_level(self.current_level_name)
-        self.map = self.level_manager.get_game_map()
-
         self.camera = Camera(0, 0, *self.__screen_size)
         self.dt = 0
 
         self.player_id = None
+        self.identify_player()
+
+        self.level_manager = LevelManager(self)
+        self.current_level_name = self.level_manager.get_levels_name()[0] # затычка. временно
+        self.level_manager.load_level(self.current_level_name)
+        self.map = self.level_manager.get_game_map()
 
         self.app_state = AppState.RUN
         self.game_state = GameState.RUN
@@ -78,11 +79,12 @@ class Game:
                 Systems.system_player_movement(self.world, keys, self.dt)
                 self.trigger.update(self.world, self.dt)
                 Systems.system_draw_circle_around_target(self.world, self.camera, mouse_pos, self.window)
-                Systems.system_patrol_update(self.world, self.dt)
-                Systems.system_patrol_move(self.world, self.dt)
                 Systems.system_collision_separator(self.world)
                 Systems.system_move(self.world)
                 Systems.system_change_zombie_state(self.world, self.player_id)
+                Systems.system_enemy_move(self.world, self.dt)
+                Systems.system_patrol_update(self.world, self.level_manager.map_manager, self.dt)
+                Systems.system_patrol_update_point_reached(self.world)
 
             if self.game_state == GameState.DIALOG:
                 self.dialog.update(self.dt, mouse_pos, mouse_relesed)

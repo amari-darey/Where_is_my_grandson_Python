@@ -13,43 +13,6 @@ from config.tiles import *
 
 class Utils:
     @staticmethod
-    def load_map(path: str) -> list[list]:
-        if not os.path.exists(path): return
-
-        game_map = []
-        with open(path, "r", encoding="utf-8") as file:
-            for line in file:
-                game_map.append(line.split())
-        
-        return game_map
-
-    @staticmethod
-    def create_map(game_map: dict[str, tuple[tuple[str]]]) -> pygame.Surface:
-        """Создание карты
-
-        Args:
-            game_map (dict[str, tuple[tuple[str]]]): Словарь где ключами выступают названия слоёв 
-            а значениями кортеж с кортежами с номерами тайлов
-
-        Returns:
-            pygame.Surface: Картинка карты
-        """
-        map_width = len(game_map["base"][0])
-        map_height = len(game_map["base"])
-        surface = pygame.Surface((map_width * TILE_SIZE, map_height* TILE_SIZE))
-        for name, layer in game_map.items():
-            x = 0
-            y = 0
-            for row in layer:
-                for col in row:
-                    surface.blit(Utils.load_image_with_scale(TILES[col], (TILE_SIZE, TILE_SIZE)), (x, y))
-                    x += TILE_SIZE
-                x = 0
-                y += TILE_SIZE
-        return surface
-
-
-    @staticmethod
     def load_image_with_scale(path: str, size: tuple[int, int], cache={}) -> pygame.Surface:
         """Загрузка одного изображения нужного размера
 

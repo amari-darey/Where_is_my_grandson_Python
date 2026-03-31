@@ -11,7 +11,7 @@ from random import randint
 
 class EntityFabric:
     @staticmethod
-    def create_player(world: World, game_map: Map, pos: tuple[int, int]) -> UUID:
+    def create_player(world: World, pos: tuple[int, int]) -> UUID:
         """Создание игрока
 
         Components entered:
@@ -45,7 +45,6 @@ class EntityFabric:
             ComponentPlayer(),
             ComponentTransform(*entyti_pos, *PLAYER_SIZE),
             ComponentDirection(StateDirection.RIGHT),
-            ComponentMapPosition(game_map.add_to_map(entyti_pos)),
             ComponentControl(pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d, pygame.K_SPACE),
             ComponentSpeed(PLAYER_SPEED),
             ComponentImage(entity_animation[0]),
@@ -62,7 +61,7 @@ class EntityFabric:
         return entity
     
     @staticmethod
-    def create_zombie(world: World, game_map: Map, pos: tuple[int, int], patrol: tuple[tuple[int, int]]|None = None) -> UUID:
+    def create_zombie(world: World, pos: tuple[int, int], patrol: tuple[tuple[int, int]]|None = None) -> UUID:
         """Создание зомби
 
         Components entered:
@@ -104,15 +103,15 @@ class EntityFabric:
             ComponentZombie(),
             ComponentTransform(*entyti_pos, *ZOMBIE_SIZE),
             ComponentDirection(StateDirection.LEFT),
-            ComponentMapPosition(game_map.add_to_map(entyti_pos)),
             ComponentImage(entity_animation[0]),
             ComponentAnimation(ZOMBIE_ANIMATION_FRAME_RATE, 0),
             ComponentState(ZOMBIE_START_STATE, None, type(ZOMBIE_START_STATE)),
             ComponentSpeed(ZOMBIE_SPEED),
-            ComponentPatrol(deque(patrol_points), 1200),
+            ComponentPatrol(deque(patrol_points), ZOMBIE_PATROL_DELAY),
             ComponentChase(None, ZOMBIE_CHASE_DISTANCE),
             ComponentVelocity(0, 0),
-            ComponentCollision(ZOMBIE_MIN_DISTANCE)
+            ComponentCollision(ZOMBIE_MIN_DISTANCE),
+            ComponentPath([])
         )
 
         for state in ZOMBIE_STATES:
