@@ -117,6 +117,15 @@ class Systems:
         window: pygame.Surface,
         max_distanse: int = 50
         ) -> None:
+        """Система отрисовки круга над текущим таргетов 
+
+        Args:
+            world (World): Эклемпляр класса World
+            camera (Camera): Эклемпляр класса Camera
+            mouse_pos (tuple[int, int] | pygame.Vector2): Позиция мыши на экране
+            window (pygame.Surface): Surface окна игры
+            max_distanse (int, optional): _description_. Defaults to 50.
+        """
 
         closest_entity = Utils.get_closest_enemy_to_mouse(world, camera, mouse_pos, max_distanse)
         if closest_entity:
@@ -127,6 +136,17 @@ class Systems:
 
     @staticmethod
     def system_patrol_update(world: World, map_manager: Map, dt: int) -> None:
+        """Обновление системы патруля.  
+        Обновляет:  
+            Задержку между достичением точки и движением к следующей  
+            Смена текущей точки, если задаржка закончилась  
+            Получение пути к новой точке маршрута  
+
+        Args:
+            world (World): Экземпляр класса World
+            map_manager (Map): Экземпляр класса Map
+            dt (int): Время с последнего кадра
+        """
         entities = world.get_entities_with_all(ComponentPatrol, ComponentPath, ComponentTransform)
         for entity in entities:
             patrol = world.get_component(entity, ComponentPatrol)
@@ -144,6 +164,11 @@ class Systems:
 
     @staticmethod
     def system_patrol_update_point_reached(world: World) -> None:
+        """Система обновления достижения точки маршрута системы патруля
+
+        Args:
+            world (World): Экземпляр класса Map
+        """
         entities = world.get_entities_with_all(
             ComponentPatrol, 
             ComponentTransform,
@@ -162,6 +187,12 @@ class Systems:
 
     @staticmethod
     def system_change_zombie_state(world: World, player: UUID):
+        """Система смены состояния зомби
+
+        Args:
+            world (World): Экземпляр класса World
+            player (UUID): id сущности игрока
+        """
         player_pos = world.get_component(player, ComponentTransform).vector
         entities = world.get_entities_with_all(ComponentZombie, ComponentState)
         for entity in entities:
@@ -179,6 +210,11 @@ class Systems:
 
     @staticmethod
     def system_move(world: World):
+        """Система движения всех сущностей с компонентами ComponentVelocity и ComponentTransform
+
+        Args:
+            world (World): Экземпляр класса World
+        """
         entities = world.get_entities_with_all(ComponentTransform, ComponentVelocity)
         for entity in entities:
             entity_velocity = world.get_component(entity, ComponentVelocity)
@@ -192,6 +228,13 @@ class Systems:
 
     @staticmethod
     def system_enemy_move(world: World, dt: int):
+        """Система определения направления движения для сущностей с компонентами  
+        ComponentTransform, ComponentVelocity и ComponentPath  
+
+        Args:
+            world (World): Экземпляр класса World
+            dt (int): Время с последнего кадра
+        """
         dt = dt / 1000
         entities = world.get_entities_with_all(ComponentTransform, ComponentVelocity, ComponentPath)
         for entity in entities:
