@@ -2,7 +2,6 @@ from uuid import UUID
 
 from src.world import World
 from src.utils import Utils
-from src.map_manager import Map
 from src.components import *
 from config.entities.player import *
 from config.entities.zombie import *
@@ -120,4 +119,8 @@ class EntityFabric:
         return entity
 
 
+ENTITYFABRIC_ENTITY = {
+    "player": EntityFabric.create_player,
+    "zombie": EntityFabric.create_zombie
+}
     

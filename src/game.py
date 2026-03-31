@@ -37,7 +37,7 @@ class Game:
 
         self.level_manager = LevelManager(self)
         self.current_level_name = self.level_manager.get_levels_name()[0] # затычка. временно
-        self.level_manager.load_level(self.current_level_name)
+        self.level_manager.load_level_by_name(self.current_level_name)
         self.map = self.level_manager.get_game_map()
 
         self.app_state = AppState.RUN
