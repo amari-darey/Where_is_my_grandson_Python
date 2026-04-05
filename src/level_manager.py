@@ -30,7 +30,7 @@ class LevelManager:
         """Загрузка уровней из стандартной папки Path_to_game/levels/
         """
         if os.path.exists(LEVELS_PATH):
-            for level in os.listdir(LEVELS_PATH):
+            for level in list(filter(lambda path: "tileset" not in path, os.listdir(LEVELS_PATH))):
                 with open(os.path.join(LEVELS_PATH, level), "r", encoding="utf-8") as level:
                     data = json.load(level)
                     if self.__check_level(data):

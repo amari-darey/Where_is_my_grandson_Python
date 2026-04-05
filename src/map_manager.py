@@ -3,14 +3,19 @@ import pygame
 from uuid import UUID
 from typing import Optional
 from heapq import heappush, heappop
+import os
+
 from src.utils import Utils
+from src.tilemanager import TileManager
 from config.tiles import TILE_SIZE, TILES
+from config.paths import LEVELS_PATH
 
 
 class Map:
     def __init__(self):
         self.game_map = None
         self.nav_mesh_map = None
+        self.__tile_manager = TileManager()
 
     def __create_nav_mesh_map(self, game_map: pygame.Surface) -> list[list[UUID | bool | None]]:
         """Создание базовой пустой карты
@@ -48,13 +53,20 @@ class Map:
             y = 0
             for row in layer:
                 for col in row:
-                    surface.blit(Utils.load_image_with_scale(TILES[col], (TILE_SIZE, TILE_SIZE)), (x, y))
+                    surface.blit(self.__tile_manager.get_tile(col), (x, y))
                     x += TILE_SIZE
                 x = 0
                 y += TILE_SIZE
         return surface
     
+    def __load_tiles(self, game_map: dict[str, tuple[tuple[str]]]) -> None:
+        paths = game_map.get("tileset")
+        if paths:
+            for path in paths:
+                self.__tile_manager.load_tileset(os.path.join(LEVELS_PATH, path))
+    
     def load_new_map(self, game_map: dict[str, tuple[tuple[str]]]):
+        self.__load_tiles(game_map)
         self.game_map = self.__create_map(game_map)
         self.nav_mesh_map = self.__create_nav_mesh_map(self.game_map)
 

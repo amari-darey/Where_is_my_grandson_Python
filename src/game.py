@@ -1,6 +1,5 @@
 import pygame
 
-from uuid import UUID
 from enum import Enum
 
 from src.world import World
